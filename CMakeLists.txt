@@ -1,0 +1,68 @@
+cmake_minimum_required(VERSION 3.20)
+project(user_mgmt_system LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# ================================================
+# Descarga automática de CPM.cmake si no existe
+# ================================================
+set(CPM_DOWNLOAD_VERSION 0.38.2)
+set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
+
+if(NOT EXISTS ${CPM_DOWNLOAD_LOCATION})
+    message(STATUS "Downloading CPM.cmake to ${CPM_DOWNLOAD_LOCATION}")
+    file(DOWNLOAD
+        https://github.com/cpm-cmake/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake
+        ${CPM_DOWNLOAD_LOCATION}
+    )
+endif()
+
+include(${CPM_DOWNLOAD_LOCATION})
+# ================================================
+# DEPENDENCIAS
+# ================================================
+CPMAddPackage(
+  NAME googletest
+  GITHUB_REPOSITORY google/googletest
+  VERSION 1.14.0
+)
+
+
+# ================================================
+# FUENTES PRINCIPALES
+# ================================================
+
+# Recoge todos los archivos .cpp de src/
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
+
+# Ejecutable principal
+add_executable(user_mgmt_system ${SOURCES})
+
+# Incluir directorios de headers
+target_include_directories(user_mgmt_system PRIVATE include)
+
+# ================================================
+# TESTS
+# ================================================
+
+enable_testing()
+
+# Recoge todos los archivos .cpp de tests/
+file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
+file(GLOB_RECURSE APP_SOURCES_FOR_TESTS CONFIGURE_DEPENDS src/*.cpp)
+
+list(REMOVE_ITEM APP_SOURCES_FOR_TESTS "${CMAKE_SOURCE_DIR}/src/main.cpp")
+# Crea el ejecutable de tests
+add_executable(tests_runner ${TEST_SOURCES} ${APP_SOURCES_FOR_TESTS})
+
+target_include_directories(tests_runner PRIVATE
+    include
+    src
+)
+target_link_libraries(tests_runner PRIVATE GTest::gtest_main)
+
+
+include(GoogleTest)
+gtest_discover_tests(tests_runner)

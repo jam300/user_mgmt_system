@@ -1,0 +1,32 @@
+# Build
+build/
+build-*/
+
+# Visual Studio
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+*.user
+*.suo
+
+# VSCode
+.vscode/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+Testing/
+CPack*
+install_manifest.txt
+
+# Logs
+*.log
+
+# Backup
+*~
+*.swp
+*.bak
