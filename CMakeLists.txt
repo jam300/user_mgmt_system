@@ -29,6 +29,12 @@ CPMAddPackage(
   VERSION 1.14.0
 )
 
+CPMAddPackage(
+  NAME spdlog
+  GITHUB_REPOSITORY gabime/spdlog
+  VERSION 1.13.0
+)
+
 # ================================
 # Subdirectorios
 # ================================

@@ -42,6 +42,7 @@ tests/tests_runner*
 
 # Logs
 *.log
+/app.log
 
 # Backup
 *~

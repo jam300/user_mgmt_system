@@ -16,7 +16,12 @@ target_include_directories(tests_runner PRIVATE
     ${PROJECT_SOURCE_DIR}/src
 )
 
-target_link_libraries(tests_runner PRIVATE GTest::gtest_main)
+#target_link_libraries(tests_runner PRIVATE GTest::gtest_main)
+target_link_libraries(tests_runner
+  PRIVATE
+    gtest_main
+    spdlog::spdlog  # <--- Agrega esto
+)
 
 include(GoogleTest)
 gtest_discover_tests(tests_runner)

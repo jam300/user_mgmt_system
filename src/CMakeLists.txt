@@ -7,3 +7,5 @@ add_executable(user_mgmt_system ${SRC_FILES})
 target_include_directories(user_mgmt_system PRIVATE
     ${PROJECT_SOURCE_DIR}/include
 )
+
+target_link_libraries(user_mgmt_system PRIVATE spdlog::spdlog)
