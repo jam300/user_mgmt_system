@@ -63,7 +63,7 @@ namespace Domain
     {
         if (!isUserExists(username))
         {
-            throw  UserNotFoundException("DISABLE USER " + username , "User does not exist");
+            throw  UserNotFoundException("DISABLE USER " + username , " User does not exist");
         }
 
         m_userMap[username]->disable();
@@ -94,12 +94,15 @@ namespace Domain
     void SystemState::AddUserToGroup(const std::string& username, const std::string& groupName)
     {
         if (!isUserExists(username))
-            throw UserNotFoundException("ADD USER " + username + " TO GROUP " + groupName, "User does not exist");
+            throw  UserNotFoundException("ADD USER " + username + " TO GROUP " + groupName, " User does not exist");
+
+        if (isUserInGroup(username, groupName))
+            throw CommandExecutionException("ADD USER " + username + " TO GROUP " + groupName, " User already belong in that group");
 
         auto user = m_userMap.at(username);
 
         if(user->isDisabled())
-            throw CommandExecutionException("ADD USER " + username + " TO GROUP " + groupName, "User is disabled");
+            throw CommandExecutionException("ADD USER " + username + " TO GROUP " + groupName, " User is disabled");
 
         if (!isGroupExists(groupName))
         {
@@ -114,13 +117,13 @@ namespace Domain
     void SystemState::RemoveUserFromGroup(const std::string& username, const std::string& groupName)
     {
         if (!isUserExists(username) )
-            throw UserNotFoundException("REMOVE USER " + username + " TO GROUP " + groupName, "User does not exist");
+            throw UserNotFoundException("REMOVE USER " + username + " FROM GROUP " + groupName, " User does not exist");
 
         if ( !isGroupExists(groupName))
-            throw UserNotFoundException("REMOVE USER " + username + " TO GROUP " + groupName, "Group does not exist");
+            throw CommandExecutionException("REMOVE USER " + username + " FROM GROUP " + groupName, " Group does not exist");
 
         if ( !isUserInGroup(username, groupName))
-            throw UserNotFoundException("REMOVE USER " + username + " TO GROUP " + groupName, "User doesn't belong in that group");
+            throw CommandExecutionException("REMOVE USER " + username + " FROM GROUP " + groupName, " User doesn't belong in that group");
 
         auto user = m_userMap.at(username);
         auto group = m_groupMap.at(groupName);
@@ -138,12 +141,12 @@ namespace Domain
     {
         if (!isUserExists(toUser))
         {
-            throw UserNotFoundException("SEND MESSAGE  " + toUser + " '" + message->getContent() +" '", "User does not exist");
+            throw UserNotFoundException("SEND MESSAGE  " + toUser + " '" + message->getContent() +" '", " User does not exist");
         }
 
         auto user = m_userMap.at(toUser);
         if(user->isDisabled())
-            throw CommandExecutionException("SEND MESSAGE  " + toUser + " '" + message->getContent() +" '", "User is disabled");
+            throw CommandExecutionException("SEND MESSAGE  " + toUser + " '" + message->getContent() +" '", " User is disabled");
         user->AddMessage(std::move(message));
     }
 
@@ -151,7 +154,7 @@ namespace Domain
     {
         if (!isUserExists(username))
         {
-            throw UserNotFoundException("GET MESSAGE HISTORY " + username, "User does not exist");
+            throw UserNotFoundException("GET MESSAGE HISTORY " + username, " User does not exist");
         }
 
         return m_userMap.at(username)->getMessages();
