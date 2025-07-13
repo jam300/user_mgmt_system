@@ -14,14 +14,31 @@ build-*/
 .vscode/
 
 # CMake
-CMakeCache.txt
+build/
 CMakeFiles/
+CMakeCache.txt
 cmake_install.cmake
-Makefile
 CTestTestfile.cmake
-Testing/
-CPack*
-install_manifest.txt
+cpm-package-lock.cmake
+
+# Visual Studio
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.user
+*.obj
+*.pdb
+*.idb
+*.aps
+*.ncb
+*.suo
+*.ipch
+*.log
+*.tlog
+*.vs/
+
+# GTest artifacts (opcional)
+tests/tests_runner*
 
 # Logs
 *.log
