@@ -29,40 +29,9 @@ CPMAddPackage(
   VERSION 1.14.0
 )
 
-
-# ================================================
-# FUENTES PRINCIPALES
-# ================================================
-
-# Recoge todos los archivos .cpp de src/
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
-
-# Ejecutable principal
-add_executable(user_mgmt_system ${SOURCES})
-
-# Incluir directorios de headers
-target_include_directories(user_mgmt_system PRIVATE include)
-
-# ================================================
-# TESTS
-# ================================================
-
+# ================================
+# Subdirectorios
+# ================================
+add_subdirectory(src)
 enable_testing()
-
-# Recoge todos los archivos .cpp de tests/
-file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
-file(GLOB_RECURSE APP_SOURCES_FOR_TESTS CONFIGURE_DEPENDS src/*.cpp)
-
-list(REMOVE_ITEM APP_SOURCES_FOR_TESTS "${CMAKE_SOURCE_DIR}/src/main.cpp")
-# Crea el ejecutable de tests
-add_executable(tests_runner ${TEST_SOURCES} ${APP_SOURCES_FOR_TESTS})
-
-target_include_directories(tests_runner PRIVATE
-    include
-    src
-)
-target_link_libraries(tests_runner PRIVATE GTest::gtest_main)
-
-
-include(GoogleTest)
-gtest_discover_tests(tests_runner)
+add_subdirectory(tests)
