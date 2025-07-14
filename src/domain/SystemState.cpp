@@ -25,7 +25,7 @@ namespace Domain
         if (groupIt == m_groupMap.end())
             return false;
 
-        const auto& users = groupIt->second->getMembers(); // Devuelve vector<weak_ptr<User>>
+        const auto& users = groupIt->second->getMembers();
         for (const auto& user : users)
         {
             if (user && user->getUsername() == username)
@@ -37,9 +37,7 @@ namespace Domain
     void SystemState::AddUser(const std::shared_ptr<User>& user)
     {
         if (isUserExists(user->getUsername()))
-        {
             throw  UserAlreadyExistsException("ADD USER ", "User " + user->getUsername() + " already exist");
-        }
 
         m_userMap[user->getUsername()] = user;
     }
@@ -52,9 +50,7 @@ namespace Domain
     void SystemState::DeleteUser(const std::string& username)
     {
         if (!isUserExists(username))
-        {
             throw  UserNotFoundException("DELETE USER", "User: " + username + " does not exist");
-        }
 
         m_userMap.erase(username);
     }
@@ -62,10 +58,7 @@ namespace Domain
     void SystemState::DisableUser(const std::string& username)
     {
         if (!isUserExists(username))
-        {
             throw  UserNotFoundException("DISABLE USER " + username , " User does not exist");
-        }
-
         m_userMap[username]->disable();
     }
 
@@ -132,17 +125,13 @@ namespace Domain
         user->RemoveGroup(group);
 
         if (group->getMemberCount() == 0)
-        {
-            m_groupMap.erase(groupName);
-        }
+                m_groupMap.erase(groupName);
     }
 
     void SystemState::SendMessage(const std::string& toUser, std::unique_ptr<Message> message)
     {
         if (!isUserExists(toUser))
-        {
             throw UserNotFoundException("SEND MESSAGE  " + toUser + " '" + message->getContent() +" '", " User does not exist");
-        }
 
         auto user = m_userMap.at(toUser);
         if(user->isDisabled())
@@ -153,9 +142,7 @@ namespace Domain
     const std::vector<std::unique_ptr<Message>>& SystemState::getMessageHistory(const std::string& username) const
     {
         if (!isUserExists(username))
-        {
             throw UserNotFoundException("GET MESSAGE HISTORY " + username, " User does not exist");
-        }
 
         return m_userMap.at(username)->getMessages();
     }

@@ -21,7 +21,6 @@ namespace App
 
             void registerCommand(const std::string& commandKey, CommandFactory command_task);
             std::unique_ptr<Commands::ICommand> createCommand(const std::string& commandName, const std::vector<std::string>& args) const;
-            std::vector<std::string> GetAllCommandRegistry() const;
         private:
             std::unordered_map<std::string, CommandFactory> m_registryMap;
     };
