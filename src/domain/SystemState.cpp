@@ -25,8 +25,8 @@ namespace Domain
         if (groupIt == m_groupMap.end())
             return false;
 
-        const auto& users = groupIt->second->getMembers(); // Devuelve vector<weak_ptr<User>>
-        for (const auto& user : users)
+        const auto& users = groupIt->second->getMembers();
+        for (const auto& user: users)
         {
             if (user && user->getUsername() == username)
                 return true;
@@ -63,7 +63,7 @@ namespace Domain
     {
         if (!isUserExists(username))
         {
-            throw  UserNotFoundException("DISABLE USER " + username , " User does not exist");
+            throw  UserNotFoundException("DISABLE USER " + username, " User does not exist");
         }
 
         m_userMap[username]->disable();
