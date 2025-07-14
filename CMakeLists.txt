@@ -29,6 +29,13 @@ CPMAddPackage(
   VERSION 1.14.0
 )
 
+CPMAddPackage(
+  NAME fmt
+  GITHUB_REPOSITORY fmtlib/fmt
+  GIT_TAG "8.1.1"
+  OPTIONS "FMT_HEADER_ONLY ON"
+)
+
 # ================================
 # Subdirectorios
 # ================================
