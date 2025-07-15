@@ -5,16 +5,18 @@
 #include <map>
 #include <functional>
 
+
+
 namespace fs = std::filesystem;
 
 void showMenu()
 {
     std::cout << "\n=== MAIN MENU ===\n"
-          << "1. Run tasks from files\n"
-          << "2. Show task directory path\n"
-          << "3. Update task directory path\n"
-          << "4. Exit\n"
-          << "Select an option: ";
+            << "1. Run tasks from files\n"
+            << "2. Show task directory path\n"
+            << "3. Update task directory path\n"
+            << "4. Exit\n"
+            << "Select an option: ";
 }
 
 int main()

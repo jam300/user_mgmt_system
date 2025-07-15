@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
-
+#include "parsec/parsec.hpp"
 #include "commands/ICommand.h"
 #include "CommandRegistry.h"
 #include "utils/Types.h"
@@ -24,4 +24,10 @@ namespace App
             std::string CleanLine(const std::string &line) const;
             TasksTypes::TaskFile ExtractCommandAndArgs(const std::string &line) const;
     };
+
+
+    parsec::Parser<char> char_p(char c);
+    parsec::Parser<char> char_p_if(std::function<bool(char)> condition, std::string msg);
+    parsec::Parser<std::string> spaces();
+    parsec::Parser<std::string> spaces1();
 }
