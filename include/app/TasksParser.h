@@ -30,4 +30,9 @@ namespace App
     parsec::Parser<char> char_p_if(std::function<bool(char)> condition, std::string msg);
     parsec::Parser<std::string> spaces();
     parsec::Parser<std::string> spaces1();
+    parsec::Parser<std::string> word_parser();
+    parsec::Parser<std::string> quoted_string_parser();
+    parsec::Parser<std::string> argument_parser();
+    parsec::Parser<std::string> uppercase_word_parser();
+    parsec::Parser<std::string> command_name_parser();
 }
