@@ -140,23 +140,6 @@ TEST(ParserTests, WhenOpenQuoteIsMissingThenQuotedStringParserFails)
     EXPECT_EQ(result.index(), 0);
 }
 
-TEST(ParserTests, ArgumentParser_Word)
-{
-    auto parser = argument_parser();
-
-    std::string input = "Javi say: \"hello world\"";
-    auto result = parser(input, 0);
-
-    ASSERT_TRUE(result.success());
-    EXPECT_EQ(result.value(), "Javi");
-
-    std::string input2 = "\"hello world\" from Adan";
-    auto result2 = parser(input2, 0);
-
-    ASSERT_TRUE(result.success());
-    EXPECT_EQ(result2.value(),  "hello world");
-}
-
 TEST(ParserTests, whenUppercaseWordThenSuccess)
 {
     auto parser = uppercase_word_parser();
@@ -185,16 +168,6 @@ TEST(ParserTests, WhenLowerandUpperCaseWordMixThenFails)
     EXPECT_FALSE(result2.success());
 }
 
-/*TEST(ParserTests, WhenNumberInStringThenfunctionStop)
-{
-    auto parser = uppercase_word_parser();
-    auto result = parser("ADMIN1", 0);
-
-    EXPECT_TRUE(result.success());
-    EXPECT_EQ(result.value(), "ADMIN");
-    EXPECT_EQ(result.index(), 5);
-}*/
-
 TEST(ParserTests, WhenEmptyStringTheFunctionFails)
 {
     auto parser = uppercase_word_parser();
@@ -211,45 +184,63 @@ TEST(ParserTests, WhenSpaceInStringTheFunctionFails)
     EXPECT_FALSE(result.success());
 }
 
-TEST(ParserTests, WhesMultipleUppercaseWordsSeparatedBySpacesThenSuccess)
-{
-    auto parser = command_name_parser();
-    auto result = parser("ADD USER TO GROUP", 0);
-
-    EXPECT_TRUE(result.success());
-    EXPECT_EQ(result.value(), "ADD USER TO GROUP");
-    EXPECT_EQ(result.index(), 17);
-}
-
-TEST(ParserTests, WhenExtraSpacesBetweenWordsFunctionIgnoreAndSuccess)
- {
-    auto parser = command_name_parser();
-    auto result = parser("ADD   USER   TO   GROUP", 0);
-
-    EXPECT_TRUE(result.success());
-    EXPECT_EQ(result.value(), "ADD USER TO GROUP");
-    EXPECT_EQ(result.index(), 23);
-}
-
-TEST(ParserTests, FailsOnLowercaseWord) {
-    auto parser = command_name_parser();
-    auto result = parser("Add User", 0);
-    EXPECT_FALSE(result.success());
-}
-
 TEST(CommandNameParserTest, WhenLineWitnUpperandNotUpperCaseThenFunctionJustTakeUpperCase)
 {
-    auto parser = command_name_parser();
+    auto parser = combined_command_and_argument_parser();
     auto result = parser("ADD USER alice TO GROUP admin", 0);
 
-    EXPECT_TRUE(result.success());
-    EXPECT_EQ(result.value(), "ADD USER TO GROUP");
+    ASSERT_TRUE(result.success());
+
+    const auto& [command, arguments] = result.value();
+
+    EXPECT_EQ(command, "ADD USER TO GROUP");
+
+    ASSERT_EQ(arguments.size(), 2);
+    EXPECT_EQ(arguments.front(), "alice");
+    EXPECT_EQ(arguments.back(), "admin");
 }
 
-TEST(CommandNameParserTest, WhenInputStringEmptyThenfails)
+TEST(CommandNameParserTest, test1)
 {
-    auto parser = command_name_parser();
-    auto result = parser("", 0);
+    auto parser = combined_command_and_argument_parser();
+    auto result = parser("ADD USER Javi", 0);
 
-    EXPECT_FALSE(result.success());
+    ASSERT_TRUE(result.success());
+
+    const auto& [command, arguments] = result.value();
+
+    EXPECT_EQ(command, "ADD USER");
+
+    ASSERT_EQ(arguments.size(), 1);
+    EXPECT_EQ(arguments.front(), "Javi");
+}
+
+TEST(CommandNameParserTest, test2)
+{
+    auto parser = combined_command_and_argument_parser();
+    auto result = parser("EXIT", 0);
+
+    ASSERT_TRUE(result.success());
+
+    const auto& [command, arguments] = result.value();
+
+    EXPECT_EQ(command, "EXIT");
+
+    ASSERT_EQ(arguments.size(), 0);
+}
+
+TEST(CommandNameParserTest, test3)
+{
+    auto parser = combined_command_and_argument_parser();
+    auto result = parser("SEND MESSAGE Javi  \"hello world\"", 0);
+
+    ASSERT_TRUE(result.success());
+
+    const auto& [command, arguments] = result.value();
+
+    EXPECT_EQ(command, "SEND MESSAGE");
+
+    ASSERT_EQ(arguments.size(), 2);
+    EXPECT_EQ(arguments.front(), "Javi");
+    EXPECT_EQ(arguments.back(), "hello world");
 }

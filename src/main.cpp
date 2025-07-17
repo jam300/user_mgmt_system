@@ -5,8 +5,6 @@
 #include <map>
 #include <functional>
 
-
-
 namespace fs = std::filesystem;
 
 void showMenu()

@@ -1,5 +1,6 @@
 #include "commandresult/OutputPrinter.h"
 #include "utils/Symbols.h"
+#include <locale>
 
 using namespace  Symbols;
 

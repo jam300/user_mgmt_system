@@ -56,15 +56,17 @@ namespace App
 
     parsec::Parser<std::string> word_parser()
     {
-        auto word_char_p = char_p_if([](char c){
-            return !std::isspace(static_cast<unsigned char>(c)) && c != '"';
+        auto word_char_p = char_p_if([](char c)
+                {
+                    return !std::isspace(static_cast<unsigned char>(c)) && c != '"';
                 }, "Word character");
 
-        return parsec::fmap<std::string, std::list<char>>(
-                [](std::list<char> chars) {
-                    return std::string(chars.begin(), chars.end());
-                },
-                many1(word_char_p)
+            return parsec::fmap<std::string, std::list<char>>(
+                    [](std::list<char> chars)
+                    {
+                        return std::string(chars.begin(), chars.end());
+                    },
+                    many1(word_char_p)
         );
     }
 
@@ -79,21 +81,20 @@ namespace App
                 );
     }
 
-    parsec::Parser<std::string> argument_parser()
-    {
-        return quoted_string_parser() | word_parser();
-    }
-
     parsec::Parser<std::string> uppercase_word_parser()
     {
-        return [=](std::string_view sv, size_t i) -> parsec::Result<std::string> {
+        return [=](std::string_view sv, size_t i) -> parsec::Result<std::string>
+        {
+
             auto wordResult = word_parser()(sv, i);
+
             if (wordResult.failure())
                 return parsec::makeError<std::string>("Failed to parse word", i);
 
             std::string word = wordResult.value();
 
-            if (std::all_of(word.begin(), word.end(), [](unsigned char c) {
+            if (std::all_of(word.begin(), word.end(), [](unsigned char c)
+                {
                     return std::isupper(c);
                 }))
             {
@@ -107,67 +108,66 @@ namespace App
         };
     }
 
-    parsec::Parser<std::string> command_name_parser()
+    parsec::Parser<TasksTypes::TaskFile> combined_command_and_argument_parser()
     {
-        auto optional_command_word_or_skip_parser = parsec::Parser<std::optional<std::string>>(
-        [=](std::string_view sv, size_t i) -> parsec::Result<std::optional<std::string>> {
-            auto uppercase_res = uppercase_word_parser()(sv, i);
+        auto token_classifier_parser = parsec::Parser<std::pair<std::optional<std::string>, std::optional<std::string>>>(
+                [](std::string_view sv, size_t i) -> parsec::Result<std::pair<std::optional<std::string>, std::optional<std::string>>>
+                {
+                    auto uppercase_res = uppercase_word_parser()(sv, i);
+                    if(uppercase_res.success())
+                    {
+                        return parsec::makeSuccess<std::pair<std::optional<std::string>, std::optional<std::string>>>(
+                                { std::make_optional(std::move(uppercase_res.value())), std::nullopt },
+                                    uppercase_res.index()
+                            );
+                    }
 
-            if (uppercase_res.success()) {
-                return parsec::makeSuccess<std::optional<std::string>>(
-                    std::make_optional(std::move(uppercase_res.value())),
-                    uppercase_res.index(),
-                    "Parsed uppercase command part",
-                    std::make_optional<std::vector<parsec::Trace>>({std::move(uppercase_res.trace())})
-                );
-            } else {
-                // Si uppercase_word_parser falló (no era mayúscula),
-                // intenta parsear cualquier palabra para consumirla y descartarla.
-                auto any_word_res = word_parser()(sv, i);
+                    auto quoted_res = quoted_string_parser()(sv, i);
+                    if (quoted_res.success())
+                    {
+                        return parsec::makeSuccess<std::pair<std::optional<std::string>, std::optional<std::string>>>(
+                            { std::nullopt, std::make_optional(std::move(quoted_res.value())) },
+                            quoted_res.index()
+                        );
+                    }
 
-                if (any_word_res.success()) {
-                    return parsec::makeSuccess<std::optional<std::string>>(
-                        std::nullopt, // std::nullopt indica que esta palabra no contribuye al resultado final
-                        any_word_res.index(),
-                        fmt::format("Skipped non-uppercase word: '{}'", any_word_res.value()),
-                        std::make_optional<std::vector<parsec::Trace>>({std::move(any_word_res.trace()), std::move(uppercase_res.trace())})
-                    );
-                } else {
-                    // Si ni siquiera pudo parsear una palabra (fin de cadena o carácter inesperado).
-                    return parsec::makeError<std::optional<std::string>>(
-                        fmt::format("Failed to parse word after spaces: {}", uppercase_res.error()),
-                        uppercase_res.index(),
-                        std::make_optional<std::vector<parsec::Trace>>({std::move(uppercase_res.trace())})
-                    );
+                    auto word_res = word_parser()(sv, i);
+                    if (word_res.success())
+                    {
+                        return parsec::makeSuccess<std::pair<std::optional<std::string>, std::optional<std::string>>>(
+                            { std::nullopt, std::make_optional(std::move(word_res.value())) },
+                            word_res.index()
+                        );
+                    }
+
+                    return parsec::makeError<std::pair<std::optional<std::string>, std::optional<std::string>>>(
+                        "Token parsing failed", i);
                 }
-            }
-        }
-    );
+        );
 
-    // Combina el primer parser (que debe ser una palabra en mayúsculas)
-    // con cero o más de los tokens opcionales/a-saltar (precedidos por espacios).
-    auto sequence_of_command_parts =
-        uppercase_word_parser() // Primer token OBLIGATORIAMENTE en mayúsculas
-        &
-        many(spaces1() >> optional_command_word_or_skip_parser);
+        auto full_parser =  uppercase_word_parser() & parsec::many(spaces1() >> token_classifier_parser);
 
-    // Finalmente, usa fmap para transformar la tupla de resultados
-    // (`std::tuple<std::string, std::list<std::optional<std::string>>>`)
-    // en la cadena final del comando (`std::string`).
-    return parsec::fmap<std::string, std::tuple<std::string, std::list<std::optional<std::string>>>>(
-        [](const std::tuple<std::string, std::list<std::optional<std::string>>>& t) {
-            std::string command_name = std::get<0>(t); // La primera palabra (garantizada mayúscula)
+        return parsec::fmap<TaskFile, std::tuple<std::string, std::list<std::pair<std::optional<std::string>, std::optional<std::string>>>>>(
+            [](const auto& parsed) -> TaskFile
+            {
+                std::string command_name = std::get<0>(parsed);
+                std::vector<std::string> arguments;
 
-            // Itera sobre la lista de palabras opcionales (las del `many`)
-            for (const auto& opt_word : std::get<1>(t)) {
-                if (opt_word.has_value()) { // Si la palabra opcional tiene un valor (era mayúscula)
-                    command_name += " " + opt_word.value(); // Añádela al resultado
+                for (const auto& [cmd, arg] : std::get<1>(parsed))
+                {
+                    if (cmd.has_value())
+                    {
+                        command_name += " " + *cmd;
+                    }
+                    if (arg.has_value())
+                    {
+                        arguments.push_back(*arg);
+                    }
                 }
-            }
-            return command_name; // Devuelve la cadena final
-        },
-        sequence_of_command_parts // El parser cuya salida será transformada por la lambda
-    );
+
+                return {std::move(command_name), std::move(arguments)};
+
+            },full_parser);
     }
 
     TasksParser::TasksParser(const CommandRegistry &registry)
@@ -188,7 +188,11 @@ namespace App
 
             try
             {
-                auto [commandName, args] = ExtractCommandAndArgs(newLine);
+               // auto [commandName, args] = ExtractCommandAndArgs(newLine);
+                auto parser = combined_command_and_argument_parser();
+                auto result = parser(newLine, 0);
+                const auto& [commandName, args] = result.value();
+
                 auto command = m_registry.createCommand(commandName, args);
                 commands.push_back(std::move(command));
             }
@@ -236,7 +240,7 @@ namespace App
             if (iss.peek() == '"')
             {
                 std::string quoted;
-                iss.get(); // consume "
+                iss.get();
                 std::getline(iss, quoted, '"');
                 tokens.push_back(quoted);
 

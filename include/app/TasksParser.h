@@ -32,7 +32,7 @@ namespace App
     parsec::Parser<std::string> spaces1();
     parsec::Parser<std::string> word_parser();
     parsec::Parser<std::string> quoted_string_parser();
-    parsec::Parser<std::string> argument_parser();
+    parsec::Parser<TasksTypes::TaskFile> combined_command_and_argument_parser();
     parsec::Parser<std::string> uppercase_word_parser();
     parsec::Parser<std::string> command_name_parser();
 }
