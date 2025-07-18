@@ -186,7 +186,7 @@ TEST(ParserTests, WhenSpaceInStringTheFunctionFails)
 
 TEST(CommandNameParserTest, WhenLineWitnUpperandNotUpperCaseThenFunctionJustTakeUpperCase)
 {
-    auto parser = combined_command_and_argument_parser();
+    auto parser = ExtractCommandAndArgs();
     auto result = parser("ADD USER alice TO GROUP admin", 0);
 
     ASSERT_TRUE(result.success());
@@ -202,7 +202,7 @@ TEST(CommandNameParserTest, WhenLineWitnUpperandNotUpperCaseThenFunctionJustTake
 
 TEST(CommandNameParserTest, test1)
 {
-    auto parser = combined_command_and_argument_parser();
+    auto parser = ExtractCommandAndArgs();
     auto result = parser("ADD USER Javi", 0);
 
     ASSERT_TRUE(result.success());
@@ -217,7 +217,7 @@ TEST(CommandNameParserTest, test1)
 
 TEST(CommandNameParserTest, test2)
 {
-    auto parser = combined_command_and_argument_parser();
+    auto parser = ExtractCommandAndArgs();
     auto result = parser("EXIT", 0);
 
     ASSERT_TRUE(result.success());
@@ -231,7 +231,7 @@ TEST(CommandNameParserTest, test2)
 
 TEST(CommandNameParserTest, test3)
 {
-    auto parser = combined_command_and_argument_parser();
+    auto parser = ExtractCommandAndArgs();
     auto result = parser("SEND MESSAGE Javi  \"hello world\"", 0);
 
     ASSERT_TRUE(result.success());
