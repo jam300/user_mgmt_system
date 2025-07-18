@@ -22,18 +22,18 @@ namespace CommandResult
 
     void OutputPrinter::PrintTaskStart(const std::string& taskName)
     {
-        std::cout << "[Processing task: " << taskName << "]\n";
+        std::cout << "[Processing task: " << SYMBOL_ARROW <<"  " << taskName << "]\n";
     }
 
     void OutputPrinter::PrintTaskFailure(const std::string& taskName)
     {
-        std::cout << "[Task " << taskName << " stopped due to failure]\n";
+        std::cout << "[ " << SYMBOL_TASK_FAILED <<" Task " << taskName << " stopped due to failure]\n";
         std::cout << std::endl;
     }
 
     void OutputPrinter::PrintTaskSuccess(const std::string& taskName)
     {
-        std::cout << "[Task " << taskName << " completed successfully]\n";
+        std::cout << "[Task " << taskName << " completed successfully" << SYMBOL_COMPLETED << "]\n";
         std::cout << std::endl;
     }
 }
