@@ -18,6 +18,12 @@ using namespace CMD;
 using namespace ErrorHandling::Exceptions;
 namespace App
 {
+    /**
+     * @brief Constructs and initializes the CommandRegistry with all available commands.
+     *Registers all command keys with their corresponding command creation logic.
+     *
+     * @throws InvalidArgumentException if the number of arguments for a command is incorrect.
+     */
     CommandRegistry::CommandRegistry()
     {
         registerCommand(CMD_ADD_USER_TO_GROUP, [](const std::vector<std::string>& args)
@@ -86,12 +92,26 @@ namespace App
                         return std::make_unique<Commands::SendMessageCommand>(args[0], args[1]);
                     });
     }
-
+    /**
+     * @brief Registers a new command into the registry.
+     *
+     * @param commandKey The key that identifies the command (usually an uppercase string like "ADD USER").
+     * @param command_task A factory lambda or function that returns a new command object based on input arguments.
+     */
     void CommandRegistry::registerCommand(const std::string &commandKey, CommandFactory command_task)
     {
         m_registryMap[commandKey] = std::move(command_task);
     }
-
+    /**
+     * @brief Creates a command instance from the registered commands.
+     *
+     * @param commandName The name/key of the command to create.
+     * @param args The arguments to be passed to the command constructor.
+     * @return std::unique_ptr<ICommand> The constructed command object.
+     *
+     * @throws InvalidCommandException if the command name is not registered.
+     * @throws InvalidArgumentException if the argument count is invalid for the given command.
+     */
     std::unique_ptr<Commands::ICommand> CommandRegistry::createCommand(const std::string &commnadName, const std::vector<std::string> &args) const
     {
         auto itr = m_registryMap.find(commnadName);
