@@ -1,24 +1,28 @@
 #include "app/TaskManager.h"
+#include "utils/Symbols.h"
 #include <iostream>
 #include <filesystem>
 #include <string>
 #include <map>
 #include <functional>
+#include <windows.h>
 
 namespace fs = std::filesystem;
+using namespace Symbols;
 
 void showMenu()
 {
-    std::cout << "\n=== MAIN MENU ===\n"
-          << "1. Run tasks from files\n"
-          << "2. Show task directory path\n"
-          << "3. Update task directory path\n"
-          << "4. Exit\n"
-          << "Select an option: ";
-}
+    std::cout << "\n=== MAIN MENU"<< SYMBOL_MENU<<"===\n"
+            << SYMBOL_OPTION << " 1. Run tasks from files\n"
+            << SYMBOL_OPTION << " 2. Show task directory path\n"
+            << SYMBOL_OPTION << " 3. Update task directory path\n"
+            << SYMBOL_OPTION << " 4. Exit\n"
+            << "Select an option: ";
+        }
 
 int main()
 {
+    SetConsoleOutputCP(CP_UTF8);
     try
     {
         std::string relativePath = "../tasks";

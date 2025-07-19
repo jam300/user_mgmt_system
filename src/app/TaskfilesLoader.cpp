@@ -9,9 +9,25 @@ using namespace TasksTypes;
 namespace fs = std::filesystem;
 namespace App
 {
+    /**
+     * @brief Constructs a TaskFileLoader with the specified directory path.
+     *This constructor initializes the loader to point to the directory containing task files.
+     *
+     * @param directoryPath_ The path to the directory where task files are located.
+     */
     TaskFileLoader::TaskFileLoader(const std::string& directoryPath_)
         :m_directoryPath(directoryPath_){}
-
+    
+        /**
+     * @brief Loads all task files from the specified directory.
+     *
+     * This function iterates over the files in the provided directory path and reads all `.txt` files
+     * that are not empty and contain valid content (ignoring lines that are entirely whitespace).
+     * Each valid file is parsed into a list of lines and returned as a pair of filename and content.
+     *
+     * @return ListOfTaskFiles A list of (filename, lines) pairs, each representing a parsed task file.
+     *         If the directory doesn't exist or cannot be accessed, an empty list is returned.
+     */
     ListOfTaskFiles TaskFileLoader::LoadAllTasks()const
     {
         ListOfTaskFiles tasks;
