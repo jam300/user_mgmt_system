@@ -1,24 +1,25 @@
 #pragma once
 
+#include "repositories/IUserRepository.h"
+#include "repositories/IGroupRepository.h"
+#include "User.h"
+#include "Group.h"
+#include "Message.h"
+
 #include <unordered_map>
 #include <vector>
 #include <string>
 #include <optional>
-
-#include "User.h"
-#include "Group.h"
-#include "Message.h"
 
 namespace Domain
 {
     class SystemState
     {
         public:
-            SystemState() = default;
+            SystemState(std::shared_ptr<Repository::IUserRepository> userRepo, std::shared_ptr<Repository::IGroupRepository> groupRepo);
+
             SystemState(const SystemState&) = delete;
             SystemState& operator=(const SystemState&) = delete;
-            SystemState(SystemState&&) noexcept = default;
-            SystemState& operator=(SystemState&&) noexcept = default;
             ~SystemState() = default;
 
             void AddUser(const std::shared_ptr<User>& user);
@@ -39,6 +40,8 @@ namespace Domain
             bool isUserInGroup(const std::string& username, const std::string& groupName) const;
             void CreateNewGroup(const std::shared_ptr<Group>& group);
 
+            std::shared_ptr<Repository::IUserRepository> m_userRepo;
+            std::shared_ptr<Repository::IGroupRepository> m_groupRepo;
             std::unordered_map<std::string, std::shared_ptr<User>> m_userMap;
             std::unordered_map<std::string, std::shared_ptr<Group>> m_groupMap;
     };

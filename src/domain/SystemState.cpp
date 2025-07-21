@@ -9,6 +9,9 @@ using namespace ErrorHandling::Exceptions;
 
 namespace Domain
 {
+
+    SystemState::SystemState(std::shared_ptr<Repository::IUserRepository> userRepo, std::shared_ptr<Repository::IGroupRepository> groupRepo)
+                        : m_userRepo(std::move(userRepo)), m_groupRepo(std::move(groupRepo)) {}
     /**
      * @brief Checks if a user with the given username exists.
      * @param username The username to check.
@@ -176,6 +179,9 @@ namespace Domain
 
         if (group->getMemberCount() == 0)
                 m_groupMap.erase(groupName);
+        /*if (groupRepository->IsGroupEmpty(groupName)) {
+    groupRepository->Remove(groupName);
+} */
     }
     /**
      * @brief Sends a message to a specific user.

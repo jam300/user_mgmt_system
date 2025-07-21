@@ -22,8 +22,7 @@ namespace App
     }
     /**
      * @brief Sets the system state shared by all commands.
-     *This state will be passed to each command when executed.
-     *
+     * This state will be passed to each command when executed.
      * @param state A shared pointer to the SystemState instance.
      */
     void TaskManager::SetState(std::shared_ptr<Domain::SystemState> state)
@@ -32,8 +31,7 @@ namespace App
     }
     /**
      * @brief Updates the task directory path.
-     *Replaces the current task file loader with a new one using the updated path.
-     *
+     * Replaces the current task file loader with a new one using the updated path.
      * @param newPath The new path to the directory containing task files.
      */
     void TaskManager::UpdateTasksPath(const std::string& newPath)
